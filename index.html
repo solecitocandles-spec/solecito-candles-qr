@@ -4,63 +4,372 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#34483b">
+<meta name="description" content="Comparte la magia de Solecito Candles con tu historia navideña.">
 <title>Solecito Candles · Comparte la magia</title>
 <style>
-:root{--cream:#f5ebdd;--gold:#d8b979;--wine:#783f3c;--green:#34483b;--ink:#302b25;--paper:#fffaf2}
-*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:Georgia,'Times New Roman',serif}
-main{max-width:560px;margin:auto;padding:16px 14px 38px}.hero{border-radius:22px;padding:25px 18px;text-align:center;color:#fff8ec;background:radial-gradient(circle at top,#657452,#34483b 65%);position:relative;overflow:hidden}
-.hero .sun{font-size:27px;color:var(--gold)}.brand{font:12px Arial,sans-serif;letter-spacing:5px;text-transform:uppercase}.hero h1{font-size:34px;font-weight:normal;margin:12px 0 8px}.hero p{font:15px/1.5 Arial,sans-serif;max-width:360px;margin:auto;color:#f7ead7}
-.buttons{display:grid;gap:10px;margin:16px 0}.btn{border:0;border-radius:13px;padding:15px 14px;text-align:left;display:flex;align-items:center;gap:12px;font:600 15px Arial,sans-serif;cursor:pointer;text-decoration:none}.btn .emoji{font-size:24px;width:30px;text-align:center}.btn small{display:block;font-weight:400;opacity:.86;margin-top:4px}.green{background:var(--green);color:white}.wine{background:var(--wine);color:white}.outline{background:var(--paper);border:1px solid var(--green);color:var(--green)}
-.panel{display:none;background:var(--paper);border:1px solid #e4d5bd;border-radius:18px;padding:15px;margin:14px 0}.panel.active{display:block}.panel h2{font-weight:normal;margin:0 0 7px;font-size:25px}.panel p,.help{font:14px/1.5 Arial,sans-serif;color:#62584b}.tabs{display:flex;gap:8px;margin:13px 0}.tab{flex:1;border:1px solid #cbb99e;border-radius:10px;padding:10px;background:#f4eadb;color:var(--green);font-weight:bold}.tab.active{background:var(--green);color:white}
-.field{display:block;margin:12px 0;font:14px Arial,sans-serif}.field input{display:block;margin-top:7px;width:100%;padding:11px;border:1px solid #d5c5ad;border-radius:10px;background:white}
-.preview-wrap{margin:12px auto;max-width:300px}.preview-wrap canvas{width:100%;height:auto;display:block;border-radius:12px;background:#e5d8c2}.video-preview{width:100%;max-height:420px;background:#1c211d;border-radius:12px;display:none}.actions{display:grid;gap:8px;margin-top:10px}.action{border:0;border-radius:10px;padding:12px;background:var(--green);color:white;font-weight:bold;cursor:pointer;font-size:14px}.action.secondary{background:#efe3d1;color:var(--green);border:1px solid #d6c3a5}.action:disabled{opacity:.5;cursor:not-allowed}
-.notice{font:12px/1.5 Arial,sans-serif;color:#786b5c;background:#f4eadb;padding:10px;border-radius:10px;margin-top:12px}.footer{text-align:center;margin-top:22px;font:12px/1.6 Arial,sans-serif;color:#786b5c}.tag{color:var(--wine);font-weight:bold}.status{font:12px Arial,sans-serif;margin-top:8px;color:var(--green);min-height:16px}
+:root {
+  --cream: #f5ebdd;
+  --gold: #d8b979;
+  --wine: #783f3c;
+  --green: #34483b;
+  --ink: #302b25;
+  --paper: #fffaf2;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+}
+main {
+  max-width: 560px;
+  margin: auto;
+  padding: 16px 14px 38px;
+}
+.hero {
+  border-radius: 22px;
+  padding: 25px 18px;
+  text-align: center;
+  color: #fff8ec;
+  background: radial-gradient(circle at top, #657452, var(--green) 65%);
+  position: relative;
+  overflow: hidden;
+}
+.hero .sun { font-size: 27px; color: var(--gold); }
+.brand {
+  font: 12px Arial, sans-serif;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+}
+.hero h1 { font-size: 34px; font-weight: normal; margin: 12px 0 8px; }
+.hero p {
+  font: 15px/1.5 Arial, sans-serif;
+  max-width: 360px;
+  margin: auto;
+  color: #f7ead7;
+}
+.buttons { display: grid; gap: 10px; margin: 16px 0; }
+.btn {
+  border: 0;
+  border-radius: 13px;
+  padding: 15px 14px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font: 600 15px Arial, sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn .emoji { font-size: 24px; width: 30px; text-align: center; }
+.btn small { display: block; font-weight: 400; opacity: .86; margin-top: 4px; }
+.green { background: var(--green); color: white; }
+.wine { background: var(--wine); color: white; }
+.outline { background: var(--paper); border: 1px solid var(--green); color: var(--green); }
+.panel {
+  display: none;
+  background: var(--paper);
+  border: 1px solid #e4d5bd;
+  border-radius: 18px;
+  padding: 15px;
+  margin: 14px 0;
+}
+.panel.active { display: block; }
+.panel h2 { font-weight: normal; margin: 0 0 7px; font-size: 25px; }
+.panel p, .help { font: 14px/1.5 Arial, sans-serif; color: #62584b; }
+.field { display: block; margin: 12px 0; font: 14px Arial, sans-serif; }
+.field input {
+  display: block;
+  margin-top: 7px;
+  width: 100%;
+  padding: 11px;
+  border: 1px solid #d5c5ad;
+  border-radius: 10px;
+  background: white;
+}
+.preview-wrap { margin: 12px auto; max-width: 300px; }
+.preview-wrap canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+  background: #e5d8c2;
+}
+.actions { display: grid; gap: 8px; margin-top: 10px; }
+.action {
+  border: 0;
+  border-radius: 10px;
+  padding: 12px;
+  background: var(--green);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+}
+.action.secondary { background: #efe3d1; color: var(--green); border: 1px solid #d6c3a5; }
+.action:disabled { opacity: .5; cursor: not-allowed; }
+.notice {
+  font: 12px/1.5 Arial, sans-serif;
+  color: #786b5c;
+  background: #f4eadb;
+  padding: 10px;
+  border-radius: 10px;
+  margin-top: 12px;
+}
+.footer { text-align: center; margin-top: 22px; font: 12px/1.6 Arial, sans-serif; color: #786b5c; }
+.tag { color: var(--wine); font-weight: bold; }
+.status { font: 12px Arial, sans-serif; margin-top: 8px; color: var(--green); min-height: 16px; }
 </style>
 </head>
 <body>
 <main>
-<header class="hero"><div class="sun">☼</div><div class="brand">Solecito Candles</div><h1>Comparte la magia</h1><p>Tu vela llegó a tus manos. Ahora hagamos que su magia llegue a más personas. ✨</p></header>
-<section class="buttons" aria-label="Elige tu experiencia">
-<button class="btn green" onclick="openCreator('tiktok')"><span class="emoji">🎬</span><span>Crear mi historia en TikTok<small>Prepara tu recuerdo navideño</small></span></button>
-<button class="btn wine" onclick="openCreator('instagram')"><span class="emoji">📸</span><span>Crear mi historia en Instagram<small>Personaliza tu foto o video</small></span></button>
-<a class="btn outline" href="https://www.tiktok.com/@solecitocandles" target="_blank" rel="noopener"><span class="emoji">🎁</span><span>Ver más velas y seguirnos<small>Descubre nuestra colección</small></span></a>
-</section>
-<section id="creator" class="panel">
-<h2>Tu momento navideño</h2><p>Elige foto o video. En el modo foto podrás descargar una historia con marco. En el modo video podrás previsualizar tu clip y descargarlo para compartirlo desde tu red social.</p>
-<div class="tabs"><button id="photoTab" class="tab active" onclick="setMode('photo')">📷 Foto</button><button id="videoTab" class="tab" onclick="setMode('video')">🎞️ Video</button></div>
-<label id="photoField" class="field">Sube una foto de tu vela<input id="photoInput" type="file" accept="image/*" capture="environment"></label>
-<label id="videoField" class="field" style="display:none">Selecciona un video<input id="videoInput" type="file" accept="video/*" capture="environment"></label>
-<div class="preview-wrap" id="photoPreview"><canvas id="canvas" width="1080" height="1920"></canvas></div>
-<video id="videoPreview" class="video-preview" controls playsinline></video>
-<div class="actions" id="photoActions"><button class="action" onclick="downloadStory()">Descargar historia con marco</button></div>
-<div class="actions" id="videoActions" style="display:none"><button class="action" onclick="downloadVideo()">Descargar mi video</button><button class="action secondary" onclick="copyCaption()">Copiar texto para publicar</button></div>
-<div class="actions"><button class="action secondary" onclick="copyCaption()">Copiar texto para publicar</button><button class="action secondary" onclick="openInstagram()">Abrir Instagram</button><button class="action secondary" onclick="openTikTok()">Abrir TikTok</button></div>
-<div class="status" id="status" aria-live="polite"></div>
-<div class="notice">Al publicar, menciona <span class="tag">@solecitocandles</span>. La publicación final la confirmas tú desde TikTok o Instagram. Esta demo no publica automáticamente ni incrusta el marco dentro del archivo de video.</div>
-</section>
-<footer class="footer">Hecho con amor para iluminar tu Navidad · <strong>@solecitocandles</strong><br>Más que velas, creamos momentos que se comparten.</footer>
+  <header class="hero">
+    <div class="sun">☼</div>
+    <div class="brand">Solecito Candles</div>
+    <h1>Comparte la magia</h1>
+    <p>Tu vela llegó a tus manos. Ahora hagamos que su magia llegue a más personas. ✨</p>
+  </header>
+
+  <section class="buttons" aria-label="Elige tu experiencia">
+    <button class="btn green" onclick="openCreator('tiktok')">
+      <span class="emoji">🎬</span>
+      <span>Crear mi historia en TikTok<small>Prepara tu recuerdo navideño</small></span>
+    </button>
+    <button class="btn wine" onclick="openCreator('instagram')">
+      <span class="emoji">📸</span>
+      <span>Crear mi historia en Instagram<small>Personaliza tu foto</small></span>
+    </button>
+    <a class="btn outline" href="https://www.tiktok.com/@solecitocandles" target="_blank" rel="noopener noreferrer">
+      <span class="emoji">🎁</span>
+      <span>Ver más velas y seguirnos<small>Descubre nuestra colección</small></span>
+    </a>
+  </section>
+
+  <section id="creator" class="panel" aria-labelledby="creatorTitle">
+    <h2 id="creatorTitle">Tu momento navideño</h2>
+    <p>Sube una foto de tu vela y crea una historia vertical con un marco navideño. Después podrás descargarla y compartirla desde tu red social.</p>
+
+    <label class="field" for="photoInput">
+      Sube una foto de tu vela
+      <input id="photoInput" type="file" accept="image/*" capture="environment">
+    </label>
+
+    <div class="preview-wrap">
+      <canvas id="canvas" width="1080" height="1920" aria-label="Vista previa de tu historia"></canvas>
+    </div>
+
+    <div class="actions">
+      <button class="action" onclick="downloadStory()">Descargar historia con marco</button>
+      <button class="action secondary" onclick="copyCaption()">Copiar texto para publicar</button>
+      <button class="action secondary" onclick="openInstagram()">Abrir mi Instagram</button>
+      <button class="action secondary" onclick="openTikTok()">Abrir mi TikTok</button>
+    </div>
+
+    <div id="status" class="status" aria-live="polite"></div>
+    <div class="notice">
+      Al publicar, menciona <span class="tag">@solecitocandles</span>. Los botones abren la plataforma para que uses tu propia cuenta (la que tengas iniciada). Primero descarga la imagen y luego selecciónala desde la opción de historia o publicación. Por seguridad, esta página no puede adjuntar la imagen ni publicarla automáticamente.
+    </div>
+  </section>
+
+  <footer class="footer">
+    Hecho con amor para iluminar tu Navidad · <strong>@solecitocandles</strong><br>
+    Más que velas, creamos momentos que se comparten.
+  </footer>
 </main>
+
 <script>
-const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
-let uploadedImage=null,videoUrl=null,currentPlatform='instagram',mode='photo';
-function openCreator(platform){currentPlatform=platform;document.getElementById('creator').classList.add('active');setMode('photo');document.getElementById('creator').scrollIntoView({behavior:'smooth',block:'start'});status('Plantilla preparada para '+(platform==='tiktok'?'TikTok':'Instagram')+'.');drawStory();}
-function status(t){document.getElementById('status').textContent=t;}
-function setMode(m){mode=m;document.getElementById('photoTab').classList.toggle('active',m==='photo');document.getElementById('videoTab').classList.toggle('active',m==='video');document.getElementById('photoField').style.display=m==='photo'?'block':'none';document.getElementById('videoField').style.display=m==='video'?'block':'none';document.getElementById('photoPreview').style.display=m==='photo'?'block':'none';document.getElementById('videoPreview').style.display=m==='video'&&videoUrl?'block':'none';document.getElementById('photoActions').style.display=m==='photo'?'grid':'none';document.getElementById('videoActions').style.display=m==='video'?'grid':'none';}
-function drawStory(){
- const w=canvas.width,h=canvas.height;
- ctx.fillStyle='#f5ebdd';ctx.fillRect(0,0,w,h);
- if(uploadedImage){const scale=Math.max(w/uploadedImage.width,h*.70/uploadedImage.height),sw=w/scale,sh=h*.70/scale,sx=(uploadedImage.width-sw)/2,sy=(uploadedImage.height-sh)/2;ctx.save();ctx.beginPath();ctx.rect(0,0,w,h*.70);ctx.clip();ctx.drawImage(uploadedImage,sx,sy,sw,sh,0,0,w,h*.70);ctx.restore();}
- else{const g=ctx.createLinearGradient(0,0,w,h*.7);g.addColorStop(0,'#34483b');g.addColorStop(1,'#783f3c');ctx.fillStyle=g;ctx.fillRect(0,0,w,h*.70);ctx.fillStyle='#d8b979';ctx.font='64px Georgia';ctx.textAlign='center';ctx.fillText('✦  ❋  ✦',w/2,h*.30);ctx.fillStyle='#fff8ec';ctx.font='52px Georgia';ctx.fillText('Tu foto va aquí',w/2,h*.40);ctx.font='30px Arial';ctx.fillText('Sube una foto de tu vela',w/2,h*.45);}
- ctx.strokeStyle='#d8b979';ctx.lineWidth=16;ctx.strokeRect(28,28,w-56,h-56);ctx.strokeStyle='#f5ebdd';ctx.lineWidth=5;ctx.strokeRect(48,48,w-96,h-96);
- ctx.fillStyle='#f5ebdd';ctx.fillRect(0,h*.70,w,h*.30);ctx.textAlign='center';ctx.fillStyle='#783f3c';ctx.font='bold 30px Arial';ctx.fillText('UNA NAVIDAD HECHA CON LUZ',w/2,h*.755);ctx.fillStyle='#34483b';ctx.font='normal 76px Georgia';ctx.fillText('Comparte la magia',w/2,h*.815);ctx.fillStyle='#51463d';ctx.font='36px Georgia';ctx.fillText('Momentos que iluminan',w/2,h*.855);ctx.fillStyle='#783f3c';ctx.font='bold 34px Arial';ctx.fillText('@solecitocandles',w/2,h*.91);ctx.fillStyle='#34483b';ctx.font='30px Arial';ctx.fillText('Más que velas, creamos recuerdos',w/2,h*.95);
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let uploadedImage = null;
+let currentPlatform = 'instagram';
+
+function status(message) {
+  document.getElementById('status').textContent = message;
 }
-document.getElementById('photoInput').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(!f)return;if(!f.type.startsWith('image/'))return status('Selecciona una imagen válida.');const r=new FileReader();r.onload=ev=>{uploadedImage=new Image();uploadedImage.onload=()=>{drawStory();status('Foto lista. Descarga tu historia cuando quieras.');};uploadedImage.src=ev.target.result;};r.readAsDataURL(f);});
-document.getElementById('videoInput').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(!f)return;if(!f.type.startsWith('video/'))return status('Selecciona un video válido.');if(videoUrl)URL.revokeObjectURL(videoUrl);videoUrl=URL.createObjectURL(f);const v=document.getElementById('videoPreview');v.src=videoUrl;v.style.display='block';setMode('video');status('Video listo para previsualizar y descargar. El marco gráfico todavía no se incrusta en el video.');});
-function downloadStory(){drawStory();const a=document.createElement('a');a.download='solecito-candles-historia-navidad.png';a.href=canvas.toDataURL('image/png');a.click();status('Historia descargada. ¡Ya puedes compartirla!');}
-function downloadVideo(){if(!videoUrl)return status('Primero selecciona un video.');const a=document.createElement('a');a.href=videoUrl;a.download='solecito-candles-video-navidad';document.body.appendChild(a);a.click();a.remove();status('Se inició la descarga del video original. Añade el texto o marco desde la app social antes de publicar.');}
-async function copyCaption(){const text='La magia de la Navidad también está en los pequeños momentos 🕯️✨ Gracias, @solecitocandles, por iluminar esta temporada. #SolecitoCandles #Navidad';try{await navigator.clipboard.writeText(text);status('Texto copiado. Pégalo en tu publicación y confirma la mención.');}catch(e){prompt('Copia este texto para tu publicación:',text);}}
-function openInstagram(){window.open('https://www.instagram.com/solecitocandles/','_blank','noopener');}
-function openTikTok(){window.open('https://www.tiktok.com/@solecitocandles','_blank','noopener');}
+
+function openCreator(platform) {
+  currentPlatform = platform;
+  document.getElementById('creator').classList.add('active');
+  document.getElementById('creator').scrollIntoView({
+    behavior: 'smooth',
+    block: 'start'
+  });
+  drawStory();
+  status('Plantilla preparada para ' +
+    (platform === 'tiktok' ? 'TikTok' : 'Instagram') + '.');
+}
+
+function drawStory() {
+  const w = canvas.width;
+  const h = canvas.height;
+  const photoHeight = h * 0.70;
+
+  // Fondo general
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = '#f5ebdd';
+  ctx.fillRect(0, 0, w, h);
+
+  // Fotografía en la parte superior, recortada para llenar el espacio
+  if (uploadedImage) {
+    const scale = Math.max(w / uploadedImage.width, photoHeight / uploadedImage.height);
+    const sourceWidth = w / scale;
+    const sourceHeight = photoHeight / scale;
+    const sourceX = (uploadedImage.width - sourceWidth) / 2;
+    const sourceY = (uploadedImage.height - sourceHeight) / 2;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, w, photoHeight);
+    ctx.clip();
+    ctx.drawImage(
+      uploadedImage,
+      sourceX, sourceY, sourceWidth, sourceHeight,
+      0, 0, w, photoHeight
+    );
+
+    // Ligero velo cálido sobre la foto para un acabado navideño
+    ctx.fillStyle = 'rgba(120, 63, 60, 0.06)';
+    ctx.fillRect(0, 0, w, photoHeight);
+    ctx.restore();
+  } else {
+    const gradient = ctx.createLinearGradient(0, 0, w, photoHeight);
+    gradient.addColorStop(0, '#34483b');
+    gradient.addColorStop(1, '#783f3c');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, w, photoHeight);
+    ctx.fillStyle = '#d8b979';
+    ctx.font = '64px Georgia';
+    ctx.textAlign = 'center';
+    ctx.fillText('✦  ❋  ✦', w / 2, photoHeight * 0.34);
+    ctx.fillStyle = '#fff8ec';
+    ctx.font = '52px Georgia';
+    ctx.fillText('Tu foto va aquí', w / 2, photoHeight * 0.46);
+    ctx.font = '30px Arial';
+    ctx.fillText('Sube una foto de tu vela', w / 2, photoHeight * 0.51);
+  }
+
+  // Marco doble dorado y crema
+  ctx.strokeStyle = '#d8b979';
+  ctx.lineWidth = 18;
+  ctx.strokeRect(30, 30, w - 60, h - 60);
+
+  ctx.strokeStyle = '#fff8ec';
+  ctx.lineWidth = 5;
+  ctx.strokeRect(52, 52, w - 104, h - 104);
+
+  // Adornos dorados en las esquinas de la zona fotográfica
+  ctx.save();
+  ctx.fillStyle = '#d8b979';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = 'bold 70px Georgia';
+  ctx.fillText('✦', 85, 90);
+  ctx.fillText('✦', w - 85, 90);
+  ctx.fillText('✦', 85, photoHeight - 35);
+  ctx.fillText('✦', w - 85, photoHeight - 35);
+  ctx.restore();
+
+  // Pie de la historia
+  ctx.fillStyle = '#f5ebdd';
+  ctx.fillRect(0, photoHeight, w, h - photoHeight);
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = '#783f3c';
+  ctx.font = 'bold 30px Arial';
+  ctx.fillText('UNA NAVIDAD HECHA CON LUZ', w / 2, h * 0.755);
+
+  ctx.fillStyle = '#34483b';
+  ctx.font = 'normal 76px Georgia';
+  ctx.fillText('Comparte la magia', w / 2, h * 0.815);
+
+  ctx.fillStyle = '#51463d';
+  ctx.font = '36px Georgia';
+  ctx.fillText('Momentos que iluminan', w / 2, h * 0.855);
+
+  ctx.fillStyle = '#783f3c';
+  ctx.font = 'bold 34px Arial';
+  ctx.fillText('@solecitocandles', w / 2, h * 0.91);
+
+  ctx.fillStyle = '#34483b';
+  ctx.font = '30px Arial';
+  ctx.fillText('Más que velas, creamos recuerdos', w / 2, h * 0.95);
+}
+
+document.getElementById('photoInput').addEventListener('change', event => {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  if (!file.type.startsWith('image/')) {
+    status('Selecciona una imagen válida.');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = loadEvent => {
+    const image = new Image();
+    image.onload = () => {
+      uploadedImage = image;
+      drawStory();
+      status('Foto lista. Descarga tu historia cuando quieras.');
+    };
+    image.onerror = () => status('No se pudo abrir la imagen. Prueba con otra foto.');
+    image.src = loadEvent.target.result;
+  };
+  reader.onerror = () => status('No se pudo leer la imagen seleccionada.');
+  reader.readAsDataURL(file);
+});
+
+function downloadStory() {
+  drawStory();
+
+  canvas.toBlob(blob => {
+    if (!blob) {
+      status('No se pudo crear la imagen. Inténtalo de nuevo.');
+      return;
+    }
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = 'solecito-candles-historia-navidad.png';
+    link.href = url;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+    status('Historia descargada. ¡Ya puedes compartirla!');
+  }, 'image/png');
+}
+
+async function copyCaption() {
+  const caption = 'La magia de la Navidad también está en los pequeños momentos 🕯️✨ Gracias, @solecitocandles, por iluminar esta temporada. #SolecitoCandles #Navidad';
+
+  try {
+    await navigator.clipboard.writeText(caption);
+    status('Texto copiado. Pégalo en tu publicación y confirma la mención.');
+  } catch (error) {
+    window.prompt('Copia este texto para tu publicación:', caption);
+  }
+}
+
+function openInstagram() {
+  // Abre Instagram general, no el perfil de Solecito Candles.
+  // Instagram no ofrece un enlace web universal que adjunte esta imagen
+  // directamente al editor de Historias desde una página externa.
+  window.open('https://www.instagram.com/', '_blank', 'noopener,noreferrer');
+  status('Instagram se abrió. En tu cuenta, crea una historia y selecciona la imagen que descargaste.');
+}
+
+function openTikTok() {
+  // Abre el cargador de TikTok para la cuenta que tenga iniciada la sesión.
+  window.open('https://www.tiktok.com/upload', '_blank', 'noopener,noreferrer');
+  status('TikTok se abrió. Verifica que sea tu cuenta y selecciona la imagen descargada para crear tu publicación.');
+}
+
 drawStory();
 </script>
-</body></html>
+</body>
+</html>
