@@ -97,6 +97,8 @@ main {
   background: #e5d8c2;
 }
 .actions { display: grid; gap: 8px; margin-top: 10px; }
+.photo-actions { margin-top: 9px; }
+#cameraInput, #galleryInput { display: none; }
 .action {
   border: 0;
   border-radius: 10px;
@@ -109,32 +111,6 @@ main {
 }
 .action.secondary { background: #efe3d1; color: var(--green); border: 1px solid #d6c3a5; }
 .action:disabled { opacity: .5; cursor: not-allowed; }
-.photo-options {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 10px;
-}
-.file-input-hidden {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
-}
-.field-help {
-  display: block;
-  margin-top: 8px;
-  font: 12px/1.45 Arial, sans-serif;
-  color: #786b5c;
-}
-@media (max-width: 440px) {
-  .photo-options { grid-template-columns: 1fr; }
-}
 .notice {
   font: 12px/1.5 Arial, sans-serif;
   color: #786b5c;
@@ -203,14 +179,13 @@ main {
     <p>Sube una foto con tu vela y crea una historia elegante para el Día de las Velitas 2026. Podrás compartirla desde tu red social.</p>
 
     <div class="field">
-      <span>Elige cómo quieres agregar tu foto</span>
-      <div class="photo-options">
-        <button class="action" type="button" onclick="document.getElementById('galleryInput').click()">🖼️ Elegir de la galería</button>
+      <strong>1. Elige cómo agregar tu foto</strong>
+      <div class="actions photo-actions">
         <button class="action secondary" type="button" onclick="document.getElementById('cameraInput').click()">📸 Tomar foto con la cámara</button>
+        <button class="action secondary" type="button" onclick="document.getElementById('galleryInput').click()">🖼️ Elegir foto de la galería</button>
       </div>
-      <input id="galleryInput" class="file-input-hidden" type="file" accept="image/*">
-      <input id="cameraInput" class="file-input-hidden" type="file" accept="image/*" capture="environment">
-      <small class="field-help">Puedes escoger una foto que ya tengas o tomar una nueva. En algunos teléfonos, la opción de cámara puede mostrar también otras opciones.</small>
+      <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden>
+      <input id="galleryInput" type="file" accept="image/*" hidden>
     </div>
 
     <div class="preview-wrap">
@@ -218,12 +193,12 @@ main {
     </div>
 
     <div class="actions">
-      <button class="action secondary" onclick="publishToTikTok()">🚀 Compartir</button>
-      <button class="action" onclick="downloadStory()">Descargar historia</button>
+      <button class="action" onclick="publishToTikTok()">🚀 Guardar y abrir TikTok</button>
+      <button class="action secondary" onclick="downloadStory()">Descargar historia</button>
     </div>
 
     <div id="status" class="status" aria-live="polite"></div>
-    <div class="notice">Para publicarla, pulsa <strong>Compartir</strong>. En celulares compatibles se abrirá el menú de compartir del teléfono: elige TikTok si aparece. Si no aparece o TikTok abre su inicio, entra en la app con la cuenta que quieras usar, pulsa <strong>+</strong>, elige <strong>Historia</strong> y carga la imagen. El texto queda copiado para pegarlo si hace falta. <strong>Importante:</strong> TikTok no ofrece a una página web normal un enlace público que obligue a abrir directamente el editor de Historias en la cuenta que esté iniciada; por eso no se puede garantizar ese salto automático.</div>
+    <div class="notice"><strong>2. Publica tu historia:</strong> pulsa «Guardar y abrir TikTok». La imagen se guardará y TikTok intentará abrirse en el teléfono. Por seguridad, una página web no puede obligar a TikTok a abrir directamente el editor de Historias; si se abre la pantalla principal, pulsa <strong>+</strong> → <strong>Historia</strong> → <strong>Subir</strong> y selecciona la imagen guardada.</div>
   </section>
 
   <footer class="footer">
@@ -338,7 +313,6 @@ function handlePhotoSelection(event) {
 
   if (!file.type.startsWith('image/')) {
     status('Selecciona una imagen válida.');
-    event.target.value = '';
     return;
   }
 
@@ -348,20 +322,17 @@ function handlePhotoSelection(event) {
     image.onload = () => {
       uploadedImage = image;
       drawStory();
-      status('¡Foto lista! Ya puedes descargar tu historia o compartirla.');
+      status('Foto lista. Descarga tu historia cuando quieras.');
     };
     image.onerror = () => status('No se pudo abrir la imagen. Prueba con otra foto.');
     image.src = loadEvent.target.result;
   };
   reader.onerror = () => status('No se pudo leer la imagen seleccionada.');
   reader.readAsDataURL(file);
-
-  // Permite volver a escoger la misma foto si el cliente quiere cambiarla.
-  event.target.value = '';
 }
 
-document.getElementById('galleryInput').addEventListener('change', handlePhotoSelection);
 document.getElementById('cameraInput').addEventListener('change', handlePhotoSelection);
+document.getElementById('galleryInput').addEventListener('change', handlePhotoSelection);
 
 function downloadStory() {
   drawStory();
@@ -388,84 +359,40 @@ function downloadStory() {
 async function publishToTikTok() {
   const caption = '¡Feliz Día de las Velitas 2026! 🕯️✨ Que nunca falte una luz que nos reúna. Gracias por compartir la magia de Solecito Candles. #SolecitoCandles #DíaDeLasVelitas2026';
 
-  drawStory();
-  status('Preparando tu historia…');
-
-  let blob;
-  try {
-    blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-  } catch (error) {
-    blob = null;
-  }
-
-  if (!blob) {
-    status('No se pudo preparar la imagen. Pulsa «Descargar historia» e inténtalo de nuevo.');
+  if (!uploadedImage) {
+    status('Primero toma una foto o elige una de la galería.');
     return;
   }
 
-  const file = new File(
-    [blob],
-    'solecito-candles-historia-velitas-2026.png',
-    { type: 'image/png' }
-  );
+  // Open TikTok directly from the button gesture. No WhatsApp/email/SMS share sheet.
+  // TikTok does not provide a public web URL that forces the Stories composer to open.
+  const tiktokTab = window.open('https://www.tiktok.com/', '_blank');
+  drawStory();
+  status('Guardando la imagen y abriendo TikTok…');
 
-  // Copy the caption first so it is ready to paste if TikTok does not accept it.
-  let copied = false;
   try {
     await navigator.clipboard.writeText(caption);
-    copied = true;
-  } catch (error) {
-    try {
-      const temp = document.createElement('textarea');
-      temp.value = caption;
-      temp.setAttribute('readonly', '');
-      temp.style.position = 'fixed';
-      temp.style.left = '-9999px';
-      document.body.appendChild(temp);
-      temp.select();
-      copied = document.execCommand('copy');
-      temp.remove();
-    } catch (_) {}
+  } catch (_) {
+    // Clipboard may be unavailable; posting can continue without it.
   }
 
-  // Native sharing can pass the actual image file and text to apps that support it.
-  // TikTok may not appear as a compatible target and web pages cannot force Story mode.
-  try {
-    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({
-        files: [file],
-        title: 'Solecito Candles · Día de las Velitas 2026',
-        text: caption
-      });
-      status(copied
-        ? 'Historia preparada y texto copiado. Si TikTok no ofrece Historias directamente, abre TikTok con la cuenta que quieras usar, pulsa + y elige Historia.'
-        : 'Historia preparada. Si TikTok no ofrece Historias directamente, abre TikTok con la cuenta que quieras usar, pulsa + y elige Historia.');
-      return;
-    }
-  } catch (error) {
-    if (error && error.name === 'AbortError') {
-      status('Compartir se canceló. La imagen sigue disponible para descargar y el texto puede estar copiado.');
-      return;
-    }
+  const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+  if (!blob) {
+    status('No se pudo crear la imagen. Pulsa «Descargar historia» e inténtalo de nuevo.');
+    if (tiktokTab) tiktokTab.close();
+    return;
   }
 
-  // Fallback: keep the image downloadable and open TikTok, without claiming
-  // that a web link can navigate to the Story composer.
-  try {
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = file.name;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1500);
-  } catch (_) {}
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'solecito-candles-historia-velitas-2026.png';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
 
-  window.open('https://www.tiktok.com/', '_blank', 'noopener,noreferrer');
-  status(copied
-    ? 'Texto copiado y descarga iniciada. En la app de TikTok que tengas abierta, con la cuenta que quieras usar, pulsa +, elige Historia y selecciona la imagen guardada.'
-    : 'Descarga iniciada. En la app de TikTok que tengas abierta, con la cuenta que quieras usar, pulsa +, elige Historia y selecciona la imagen guardada. Si hace falta, copia el texto manualmente.');
+  status('Imagen guardada y TikTok abierto. En TikTok, pulsa + → Historia → Subir y selecciona la imagen guardada.');
 }
 
 drawStory();
