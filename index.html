@@ -162,13 +162,13 @@ main {
     <div class="actions">
       <button class="action" onclick="downloadStory()">Descargar historia con marco</button>
       <button class="action secondary" onclick="copyCaption()">Copiar texto para publicar</button>
-      <button class="action secondary" onclick="openInstagram()">Abrir Instagram</button>
-      <button class="action secondary" onclick="openTikTok()">Abrir TikTok</button>
+      <button class="action secondary" onclick="openInstagram()">Abrir mi Instagram</button>
+      <button class="action secondary" onclick="openTikTok()">Abrir mi TikTok</button>
     </div>
 
     <div id="status" class="status" aria-live="polite"></div>
     <div class="notice">
-      Al publicar, menciona <span class="tag">@solecitocandles</span>. La publicación final la confirmas tú desde TikTok o Instagram. Esta página prepara y descarga la imagen, pero no publica automáticamente.
+      Al publicar, menciona <span class="tag">@solecitocandles</span>. Los botones abren la plataforma para que uses tu propia cuenta (la que tengas iniciada). Primero descarga la imagen y luego selecciónala desde la opción de historia o publicación. Por seguridad, esta página no puede adjuntar la imagen ni publicarla automáticamente.
     </div>
   </section>
 
@@ -356,11 +356,17 @@ async function copyCaption() {
 }
 
 function openInstagram() {
-  window.open('https://www.instagram.com/solecitocandles/', '_blank', 'noopener,noreferrer');
+  // Abre Instagram general, no el perfil de Solecito Candles.
+  // Instagram no ofrece un enlace web universal que adjunte esta imagen
+  // directamente al editor de Historias desde una página externa.
+  window.open('https://www.instagram.com/', '_blank', 'noopener,noreferrer');
+  status('Instagram se abrió. En tu cuenta, crea una historia y selecciona la imagen que descargaste.');
 }
 
 function openTikTok() {
-  window.open('https://www.tiktok.com/@solecitocandles', '_blank', 'noopener,noreferrer');
+  // Abre el cargador de TikTok para la cuenta que tenga iniciada la sesión.
+  window.open('https://www.tiktok.com/upload', '_blank', 'noopener,noreferrer');
+  status('TikTok se abrió. Verifica que sea tu cuenta y selecciona la imagen descargada para crear tu publicación.');
 }
 
 drawStory();
