@@ -160,7 +160,7 @@ main {
     <div class="sun">☼</div>
     <div class="brand">Solecito Candles</div>
     <h1>Comparte la magia</h1>
-    <p>Tu vela llegó a tus manos. Ahora hagamos que su magia llegue a más personas. ✨</p>
+    <p>Tu vela llegó a tus manos. Ahora hagamos que su magia llegue a más personas. Crea tu diseño y compártelo donde prefieras. ✨</p>
   </header>
 
   <section class="buttons" aria-label="Elige tu experiencia">
@@ -168,15 +168,12 @@ main {
       <span class="emoji">🎄</span>
       <span>Haz tu historia navideña<small>Sube tu foto y personalízala con nuestro marco</small></span>
     </button>
-    <a class="btn outline" href="https://www.tiktok.com/@solecitocandles" target="_blank" rel="noopener noreferrer">
-      <span class="emoji">🕯️</span>
-      <span>Siguenos y ve nuestro contenido<small>Sé parte de nuestra Familia</small></span>
-    </a>
+
   </section>
 
   <section id="creator" class="panel" aria-labelledby="creatorTitle">
     <h2 id="creatorTitle">Tu historia del Día de las Velitas</h2>
-    <p>Sube una foto con tu vela y crea una historia elegante para el Día de las Velitas 2026. Podrás compartirla desde tu red social.</p>
+    <p>Sube una foto con tu vela y crea un diseño elegante para el Día de las Velitas 2026. Después podrás compartirlo con la aplicación que prefieras.</p>
 
     <div class="field">
       <strong>1. Elige cómo agregar tu foto</strong>
@@ -193,12 +190,12 @@ main {
     </div>
 
     <div class="actions">
-      <button class="action" onclick="publishToTikTok()">🚀 Guardar y abrir TikTok</button>
-      <button class="action secondary" onclick="downloadStory()">Descargar historia</button>
+      <button class="action" type="button" onclick="shareStory()">📤 Compartir imagen</button>
+      <button class="action secondary" type="button" onclick="downloadStory()">⬇️ Descargar imagen</button>
     </div>
 
     <div id="status" class="status" aria-live="polite"></div>
-    <div class="notice"><strong>2. Publica tu historia:</strong> pulsa «Guardar y abrir TikTok». La página descargará tu diseño en PNG e intentará abrir TikTok directamente, sin mostrar el menú general de compartir. Si TikTok abre en su inicio, entra en <strong>+</strong> → <strong>Historia</strong> → <strong>Subir</strong> y selecciona la imagen descargada. Una web normal no puede obligar a TikTok a abrir la pantalla de Historias ni adjuntar un archivo local a esa pantalla; para automatizar ese paso se necesitaría una integración móvil nativa y compatibilidad específica de TikTok.</div>
+    <div class="notice"><strong>2. Comparte tu diseño:</strong> pulsa «Compartir imagen» para abrir el menú de compartir de tu teléfono o navegador y elegir una aplicación compatible. Esta opción no descarga la imagen automáticamente. Si tu navegador no permite compartir imágenes directamente, puedes utilizar «Descargar imagen» y guardarla cuando tú decidas.</div>
   </section>
 
   <footer class="footer">
@@ -212,6 +209,7 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
 let uploadedImage = null;
+let preparedShareFile = null;
 
 function status(message) {
   document.getElementById('status').textContent = message;
@@ -322,7 +320,8 @@ function handlePhotoSelection(event) {
     image.onload = () => {
       uploadedImage = image;
       drawStory();
-      status('Foto lista. Descarga tu historia cuando quieras.');
+      status('Foto cargada. Preparando tu diseño para compartir…');
+      prepareShareFile();
     };
     image.onerror = () => status('No se pudo abrir la imagen. Prueba con otra foto.');
     image.src = loadEvent.target.result;
@@ -352,70 +351,65 @@ function downloadStory() {
     link.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
 
-    status('Historia descargada. ¡Ya puedes compartirla!');
+    status('Imagen descargada. Ahora puedes compartirla desde la aplicación que prefieras.');
   }, 'image/png');
 }
 
-async function publishToTikTok() {
-  const caption = '¡Feliz Día de las Velitas 2026! 🕯️✨ Que nunca falte una luz que nos reúna. Gracias por compartir la magia de Solecito Candles. #SolecitoCandles #DíaDeLasVelitas2026';
-  const publishButton = document.querySelector('button[onclick="publishToTikTok()"]');
+function prepareShareFile() {
+  preparedShareFile = null;
+  canvas.toBlob(blob => {
+    if (!blob) {
+      status('La foto está cargada, pero no se pudo preparar la imagen. Inténtalo de nuevo.');
+      return;
+    }
+    preparedShareFile = new File(
+      [blob],
+      'solecito-candles-feliz-dia-de-las-velitas-2026.png',
+      { type: 'image/png' }
+    );
+    status('¡Tu diseño está listo! Puedes compartirlo o descargarlo.');
+  }, 'image/png');
+}
 
+async function shareStory() {
   if (!uploadedImage) {
     status('Primero toma una foto o elige una de la galería.');
     return;
   }
 
-  // Se abre el destino durante el toque del usuario para reducir el bloqueo de ventanas emergentes.
-  // Un enlace web no puede indicar a TikTok que abra específicamente el editor de Historias.
-  const tiktokTab = window.open('https://www.tiktok.com/', '_blank');
-  if (tiktokTab) {
-    try { tiktokTab.opener = null; } catch (_) {}
+  if (!preparedShareFile) {
+    status('Tu diseño se está preparando. Intenta compartirlo de nuevo en un momento.');
+    return;
   }
 
-  if (publishButton) publishButton.disabled = true;
-  drawStory();
-  status('Preparando tu diseño y abriendo TikTok…');
+  if (!navigator.share) {
+    status('Este navegador no permite abrir el menú para compartir imágenes directamente. Puedes usar «Descargar imagen» y compartirla manualmente.');
+    return;
+  }
+
+  const shareData = {
+    files: [preparedShareFile],
+    title: 'Solecito Candles · Día de las Velitas 2026',
+    text: '¡Feliz Día de las Velitas 2026! 🕯️✨ Que nunca falte una luz que nos reúna. Gracias por compartir la magia de Solecito Candles. #SolecitoCandles #DíaDeLasVelitas2026'
+  };
 
   try {
-    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-    if (!blob) {
-      status('No se pudo crear la imagen. Pulsa «Descargar historia» e inténtalo de nuevo.');
-      if (tiktokTab) tiktokTab.close();
+    if (typeof navigator.canShare === 'function' && !navigator.canShare({ files: shareData.files })) {
+      status('Tu navegador no permite compartir esta imagen directamente. Puedes usar «Descargar imagen» y compartirla manualmente.');
       return;
     }
 
-    // Descarga el PNG final con el marco y la foto elegida.
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'solecito-candles-historia-velitas-2026.png';
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 10000);
-
-    // Intenta copiar el texto sugerido; no bloquea el flujo si el navegador no permite copiar.
-    let captionCopied = false;
-    try {
-      await navigator.clipboard.writeText(caption);
-      captionCopied = true;
-    } catch (_) {
-      captionCopied = false;
-    }
-
-    if (!tiktokTab) {
-      status('La imagen se descargó. El navegador bloqueó la nueva pestaña; toca el enlace de TikTok del sitio y luego abre + → Historia → Subir.');
-    } else if (captionCopied) {
-      status('¡PNG descargado y TikTok abierto! El texto sugerido se copió. En TikTok entra en + → Historia → Subir y elige la imagen descargada.');
-    } else {
-      status('¡PNG descargado y TikTok abierto! En TikTok entra en + → Historia → Subir y elige la imagen descargada. Puedes copiar el texto sugerido desde la página si lo necesitas.');
-    }
+    // El archivo ya se preparó después de cargar la foto; la acción nativa se invoca desde el toque del usuario.
+    const sharing = navigator.share(shareData);
+    status('Se abrió el menú de compartir. Elige una aplicación y sigue las instrucciones de tu dispositivo.');
+    await sharing;
   } catch (error) {
-    console.error('Error al preparar la historia:', error);
-    status('Ocurrió un problema al preparar la imagen. Prueba con «Descargar historia».');
-  } finally {
-    if (publishButton) publishButton.disabled = false;
+    if (error && error.name === 'AbortError') {
+      status('No se compartió la imagen. Puedes volver a intentarlo cuando quieras.');
+    } else {
+      console.error('Error al compartir la imagen:', error);
+      status('No se pudo abrir el menú de compartir. Puedes usar «Descargar imagen» y compartirla manualmente.');
+    }
   }
 }
 
