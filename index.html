@@ -186,13 +186,12 @@ main {
     </div>
 
     <div class="actions">
+      <button class="action secondary" onclick="publishToTikTok()">🚀 Compartir</button>
       <button class="action" onclick="downloadStory()">Descargar historia</button>
-      <button class="action secondary" onclick="copyCaption()">Copiar texto para publicar</button>
-      <button class="action secondary" onclick="shareStory()">Compartir</button>
     </div>
 
     <div id="status" class="status" aria-live="polite"></div>
-    <div class="notice">Antes de compartir: pulsa <strong>Copiar texto</strong> para que pegues el mensaje en la descripción de tu publicación. Después pulsa <strong>Compartir</strong> y elige la aplicación que prefieras. Si tu celular no permite adjuntar la imagen desde aquí, descárgala y selecciónala manualmente.</div>
+    <div class="notice">Pulsa <strong>Compartir</strong> y abriras Historias de TikTok. Se copiará un texto y recuerda incluirlo en tu descripcion si lo deseas.  De lo contrario descarga la imagen y dentro de la app, pulsa +, elige «Historia» y «Subir» para seleccionar la imagen. Pega el texto si deseas incluirlo.</div>
   </section>
 
   <footer class="footer">
@@ -347,51 +346,42 @@ function downloadStory() {
   }, 'image/png');
 }
 
-async function copyCaption() {
+async function publishToTikTok() {
   const caption = '¡Feliz Día de las Velitas 2026! 🕯️✨ Que nunca falte una luz que nos reúna. Gracias por compartir la magia de Solecito Candles. #SolecitoCandles #DíaDeLasVelitas2026';
+
+  // Open TikTok directly from the user's tap; browser restrictions may affect this.
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  let copied = false;
 
   try {
     await navigator.clipboard.writeText(caption);
-    status('Texto copiado. Pégalo en tu publicación y confirma la mención.');
+    copied = true;
   } catch (error) {
-    window.prompt('Copia este texto para tu publicación:', caption);
+    // Fallback for browsers without Clipboard API permission.
+    try {
+      const temp = document.createElement('textarea');
+      temp.value = caption;
+      temp.setAttribute('readonly', '');
+      temp.style.position = 'fixed';
+      temp.style.opacity = '0';
+      document.body.appendChild(temp);
+      temp.select();
+      copied = document.execCommand('copy');
+      temp.remove();
+    } catch (_) {}
   }
-}
 
-async function shareStory() {
-  drawStory();
+  if (isMobile) {
+    // A web URL cannot guarantee that TikTok opens directly in the post editor.
+    window.location.href = 'https://www.tiktok.com/';
+  } else {
+    window.open('https://www.tiktok.com/', '_blank', 'noopener,noreferrer');
+  }
 
-  try {
-    if (!navigator.share || !navigator.canShare) {
-      status('Este navegador no permite compartir directamente. Pulsa «Copiar texto» y descarga la imagen para compartirla desde la aplicación que prefieras.');
-      return;
-    }
-
-    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-    if (!blob) {
-      status('No se pudo preparar la imagen. Inténtalo de nuevo.');
-      return;
-    }
-
-    const file = new File([blob], 'solecito-candles-feliz-dia-de-las-velitas-2026.png', { type: 'image/png' });
-    if (!navigator.canShare({ files: [file] })) {
-      status('Tu dispositivo no permite adjuntar la imagen desde aquí. Pulsa «Copiar texto», descarga la imagen y compártela desde tu aplicación favorita.');
-      return;
-    }
-
-    // Muestra el menú nativo para que la persona elija la app.
-    await navigator.share({
-      files: [file],
-      title: 'Solecito Candles',
-      text: 'Comparte la magia de Solecito candles ✨'
-    });
-    status('Elige dónde compartir la imagen. Recuerda pegar el texto copiado en la descripción.');
-  } catch (error) {
-    if (error && error.name === 'AbortError') {
-      status('Compartir se canceló. Puedes intentarlo de nuevo o descargar la imagen.');
-    } else {
-      status('No se pudo abrir el menú de compartir. Descarga la imagen y compártela desde la aplicación que prefieras.');
-    }
+  if (copied) {
+    status('Texto copiado.');
+  } else {
+    status('No se pudo copiar automáticamente el texto.');
   }
 }
 
