@@ -162,13 +162,13 @@ main {
     <div class="actions">
       <button class="action" onclick="downloadStory()">Descargar historia con marco</button>
       <button class="action secondary" onclick="copyCaption()">Copiar texto para publicar</button>
-      <button class="action secondary" onclick="openInstagram()">Abrir mi Instagram</button>
-      <button class="action secondary" onclick="openTikTok()">Abrir mi TikTok</button>
+      <button class="action secondary" onclick="openInstagram()">Compartir en Instagram</button>
+      <button class="action secondary" onclick="openTikTok()">Compartir en TikTok</button>
     </div>
 
     <div id="status" class="status" aria-live="polite"></div>
     <div class="notice">
-      Al publicar, menciona <span class="tag">@solecitocandles</span>. Los botones abren la plataforma para que uses tu propia cuenta (la que tengas iniciada). Primero descarga la imagen y luego selecciónala desde la opción de historia o publicación. Por seguridad, esta página no puede adjuntar la imagen ni publicarla automáticamente.
+      Al publicar, menciona <span class="tag">@solecitocandles</span>. En tu celular, usa los botones para compartir la imagen desde el menú nativo del teléfono y elige Instagram o TikTok. Si no aparece la opción de compartir, descarga la imagen y selecciónala manualmente en la aplicación.
     </div>
   </section>
 
@@ -355,18 +355,51 @@ async function copyCaption() {
   }
 }
 
+async function shareStoryToApp(appName) {
+  drawStory();
+
+  try {
+    if (!navigator.share || !navigator.canShare) {
+      status('Para compartir directamente, abre esta página en tu celular. Si no aparece compartir, descarga la imagen y adjúntala desde ' + appName + '.');
+      return;
+    }
+
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    if (!blob) {
+      status('No se pudo preparar la imagen. Inténtalo de nuevo.');
+      return;
+    }
+
+    const file = new File([blob], 'solecito-candles-historia.png', { type: 'image/png' });
+    if (!navigator.canShare({ files: [file] })) {
+      status('Tu navegador no permite compartir imágenes directamente. Descárgala y selecciónala en ' + appName + '.');
+      return;
+    }
+
+    // Abre el menú nativo de compartir del celular con la imagen ya adjunta.
+    // La persona elige Instagram o TikTok; la web no puede forzar una app concreta
+    // ni garantizar que se abra directamente el editor de Historias.
+    await navigator.share({
+      files: [file],
+      title: 'Solecito Candles',
+      text: 'Comparte la magia de Solecito Candles ✨'
+    });
+    status('Se abrió el menú de compartir. Elige ' + appName + ' para continuar.');
+  } catch (error) {
+    if (error && error.name === 'AbortError') {
+      status('Compartir se canceló. Tu imagen sigue disponible para descargar.');
+    } else {
+      status('No se pudo abrir el menú de compartir. Descarga la imagen y selecciónala en ' + appName + '.');
+    }
+  }
+}
+
 function openInstagram() {
-  // Abre Instagram general, no el perfil de Solecito Candles.
-  // Instagram no ofrece un enlace web universal que adjunte esta imagen
-  // directamente al editor de Historias desde una página externa.
-  window.open('https://www.instagram.com/', '_blank', 'noopener,noreferrer');
-  status('Instagram se abrió. En tu cuenta, crea una historia y selecciona la imagen que descargaste.');
+  shareStoryToApp('Instagram');
 }
 
 function openTikTok() {
-  // Abre el cargador de TikTok para la cuenta que tenga iniciada la sesión.
-  window.open('https://www.tiktok.com/upload', '_blank', 'noopener,noreferrer');
-  status('TikTok se abrió. Verifica que sea tu cuenta y selecciona la imagen descargada para crear tu publicación.');
+  shareStoryToApp('TikTok');
 }
 
 drawStory();
