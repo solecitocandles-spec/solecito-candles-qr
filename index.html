@@ -178,7 +178,7 @@ main {
 
     <label class="field" for="photoInput">
       Sube una foto con tu vela
-      <input id="photoInput" type="file" accept="image/*" capture="environment">
+      <input id="photoInput" type="file" accept="image/*">
     </label>
 
     <div class="preview-wrap">
@@ -191,7 +191,7 @@ main {
     </div>
 
     <div id="status" class="status" aria-live="polite"></div>
-    <div class="notice">Pulsa <strong>Compartir</strong> y abriras Historias de TikTok. Se copiará un texto y recuerda incluirlo en tu descripcion si lo deseas.  De lo contrario descarga la imagen y dentro de la app, pulsa +, elige «Historia» y «Subir» para seleccionar la imagen. Pega el texto si deseas incluirlo.</div>
+    <div class="notice">Pulsa <strong>Descargar historia</strong> para guardar la imagen. Luego pulsa <strong>Compartir</strong>: se intentará compartir la imagen y el texto desde las opciones compatibles de tu celular. Si TikTok no abre directamente el editor de historias, entra a TikTok, pulsa <strong>+</strong>, elige <strong>Historia</strong> y selecciona la imagen guardada. El texto queda copiado para pegarlo si hace falta.</div>
   </section>
 
   <footer class="footer">
@@ -349,21 +349,39 @@ function downloadStory() {
 async function publishToTikTok() {
   const caption = '¡Feliz Día de las Velitas 2026! 🕯️✨ Que nunca falte una luz que nos reúna. Gracias por compartir la magia de Solecito Candles. #SolecitoCandles #DíaDeLasVelitas2026';
 
-  // Open TikTok directly from the user's tap; browser restrictions may affect this.
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  let copied = false;
+  drawStory();
+  status('Preparando tu historia…');
 
+  let blob;
+  try {
+    blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+  } catch (error) {
+    blob = null;
+  }
+
+  if (!blob) {
+    status('No se pudo preparar la imagen. Pulsa «Descargar historia» e inténtalo de nuevo.');
+    return;
+  }
+
+  const file = new File(
+    [blob],
+    'solecito-candles-historia-velitas-2026.png',
+    { type: 'image/png' }
+  );
+
+  // Copy the caption first so it is ready to paste if TikTok does not accept it.
+  let copied = false;
   try {
     await navigator.clipboard.writeText(caption);
     copied = true;
   } catch (error) {
-    // Fallback for browsers without Clipboard API permission.
     try {
       const temp = document.createElement('textarea');
       temp.value = caption;
       temp.setAttribute('readonly', '');
       temp.style.position = 'fixed';
-      temp.style.opacity = '0';
+      temp.style.left = '-9999px';
       document.body.appendChild(temp);
       temp.select();
       copied = document.execCommand('copy');
@@ -371,18 +389,44 @@ async function publishToTikTok() {
     } catch (_) {}
   }
 
-  if (isMobile) {
-    // A web URL cannot guarantee that TikTok opens directly in the post editor.
-    window.location.href = 'https://www.tiktok.com/';
-  } else {
-    window.open('https://www.tiktok.com/', '_blank', 'noopener,noreferrer');
+  // Native sharing can pass the actual image file and text to apps that support it.
+  // TikTok may not appear as a compatible target and web pages cannot force Story mode.
+  try {
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        files: [file],
+        title: 'Solecito Candles · Día de las Velitas 2026',
+        text: caption
+      });
+      status(copied
+        ? 'Historia preparada y texto copiado. Si TikTok no ofrece Historias directamente, abre TikTok, pulsa + y elige Historia.'
+        : 'Historia preparada. Si TikTok no ofrece Historias directamente, abre TikTok, pulsa + y elige Historia.');
+      return;
+    }
+  } catch (error) {
+    if (error && error.name === 'AbortError') {
+      status('Compartir se canceló. La imagen sigue disponible para descargar y el texto puede estar copiado.');
+      return;
+    }
   }
 
-  if (copied) {
-    status('Texto copiado.');
-  } else {
-    status('No se pudo copiar automáticamente el texto.');
-  }
+  // Fallback: keep the image downloadable and open TikTok, without claiming
+  // that a web link can navigate to the Story composer.
+  try {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = file.name;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+  } catch (_) {}
+
+  window.open('https://www.tiktok.com/', '_blank', 'noopener,noreferrer');
+  status(copied
+    ? 'Texto copiado y descarga iniciada. En TikTok, pulsa +, elige Historia y selecciona la imagen guardada.'
+    : 'Descarga iniciada. En TikTok, pulsa +, elige Historia y selecciona la imagen guardada. Si hace falta, copia el texto manualmente.');
 }
 
 drawStory();
